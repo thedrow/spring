@@ -495,6 +495,16 @@ module Spring
         expr = "p Kernel.private_instance_methods.include?(:raise)"
         assert_success %(bin/rails runner '#{expr}'), stdout: "true"
       end
+
+      test "custom bundle path" do
+        FileUtils.mkdir_p app.path(".bundle").to_s
+        FileUtils.cp_r "#{app.gem_home}/", app.path(".bundle/ruby").to_s
+        app.run "bundle install --path .bundle --clean"
+
+        assert_speedup do
+          2.times { app.run "bundle exec rails runner ''" }
+        end
+      end
     end
   end
 end
